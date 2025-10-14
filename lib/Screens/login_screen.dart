@@ -4,16 +4,18 @@ import 'package:smart_stream/models/usermodel.dart';
 import 'package:smart_stream/requests/user_request.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 
-class RegisterScreen extends StatelessWidget {
-  const RegisterScreen({super.key});
+class LoginScreen extends StatelessWidget {
+  const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: Register());
+    return Scaffold(body: Login());
   }
 }
 
-class Register extends StatelessWidget {
+class Login extends StatelessWidget {
+  const Login({super.key});
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -33,6 +35,7 @@ class Register extends StatelessWidget {
           ],
         ),
       ),
+
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -46,43 +49,7 @@ class Register extends StatelessWidget {
               decoration: TextDecoration.none,
             ),
           ),
-          SizedBox(height: size.height * 0.03),
-          Form(
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            child: TextFormField(
-              style: TextStyle(color: Colors.white),
 
-              decoration: InputDecoration(
-                labelText: 'NickName',
-                labelStyle: TextStyle(color: Colors.white70),
-                prefixIcon: Icon(Icons.person, color: Colors.white70),
-                filled: true,
-                fillColor: Colors.white10,
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white54),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFF6A1B9A), width: 2),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-
-              keyboardType: TextInputType.emailAddress,
-              textCapitalization: TextCapitalization.none,
-              validator: (value) {
-                if (value == null || value.isEmpty)
-                  return 'Introduce un nombre';
-                else {
-                  if (value.length < 3) {
-                    return 'Introduce más de 3 caracteres';
-                  }
-                }
-                nickname = value;
-                return null;
-              },
-            ),
-          ),
           SizedBox(height: size.height * 0.03),
 
           Form(
@@ -115,14 +82,16 @@ class Register extends StatelessWidget {
                   if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
                     return 'Correo invalido';
                   }
+                  correo = value;
                 }
-                correo = value;
+
                 return null;
               },
             ),
           ),
 
           SizedBox(height: size.height * 0.03),
+
           Form(
             autovalidateMode: AutovalidateMode.onUserInteraction,
             child: TextFormField(
@@ -160,51 +129,51 @@ class Register extends StatelessWidget {
               },
             ),
           ),
+
           SizedBox(height: size.height * 0.03),
           ElevatedButton(
             onPressed: () async {
-              List<Usermodel> listaUsuarios = await obtenerUsuarios();
-              bool encontrado = false;
-              Usermodel newUser = Usermodel(
-                nickname: nickname,
+              Usermodel logeoUser = new Usermodel(
                 correo: correo,
                 contrasena: contrasena,
+                nickname: nickname,
               );
 
+              List<Usermodel> listaUsuarios = await obtenerUsuarios();
+              bool encontrado = false;
+
               for (Usermodel user in listaUsuarios) {
-                if (user.correo == newUser.correo) {
+                if (user.correo == correo) {
                   encontrado = true;
                   break;
                 }
               }
 
-              if (!encontrado) //podemos crear al usuario
-              {
-                print('Se puede registrar');
-                //hemos de hacer el post
-                Usermodel usuarioCreado = await crearUsuario(newUser);
-                print(usuarioCreado.correo);
-
-                if (usuarioCreado.correo != null) //se ha creado el usuario
-                {
-                  AwesomeDialog(
-                    context: context,
-                    dialogType: DialogType.success,
-                    animType: AnimType.scale,
-                    title: 'Usuario creado correctamente',
-                    desc: 'Cuenta registrada. Vaya a iniciar sesión',
-                    btnOkOnPress: () {},
-                  ).show();
-                }
-              } else {
+              if (!encontrado) {
                 AwesomeDialog(
                   context: context,
                   dialogType: DialogType.error,
                   animType: AnimType.scale,
-                  title: 'Usuario con correo existente',
-                  desc: 'Este correo ya existe, introduzca otro.',
+                  title: 'Correo no existente',
+                  desc: 'No existe un usuario con este correo.',
                   btnOkOnPress: () {},
                 ).show();
+              } else //intentamos procesar el login
+              {
+                bool intentologin = await intentoLogin(logeoUser);
+
+                if (intentologin)
+                  print('Bienvenido');
+                else {
+                  AwesomeDialog(
+                    context: context,
+                    dialogType: DialogType.error,
+                    animType: AnimType.scale,
+                    title: 'Credenciales incorrectas',
+                    desc: 'Revisa que la contraseña es correcta',
+                    btnOkOnPress: () {},
+                  ).show();
+                }
               }
             },
             style: FilledButton.styleFrom(
@@ -216,7 +185,7 @@ class Register extends StatelessWidget {
             ),
 
             child: Text(
-              'Registro',
+              'Iniciar sesión',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -229,6 +198,3 @@ class Register extends StatelessWidget {
     );
   }
 }
-
-//el navigator.pop sirve para eliminar la pantalla actual de la pilla y llevarte
-//a la pantalla anterior

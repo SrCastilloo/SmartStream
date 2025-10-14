@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:smart_stream/Screens/login_screen.dart';
 import 'package:smart_stream/Screens/register_screen.dart'; //fuentes de google
 
 class Bienvenida extends StatelessWidget {
@@ -11,7 +12,7 @@ class Bienvenida extends StatelessWidget {
       routes: {
         //rutas de navegación de la app
         '/registro': (context) => RegisterScreen(),
-        //'/iniciosesion': (context) => loginScreen(),
+        '/iniciosesion': (context) => LoginScreen(),
       },
       home: PantallaInicial(),
       debugShowCheckedModeBanner: false,
@@ -90,7 +91,9 @@ class PantallaInicial extends StatelessWidget {
               ),
               SizedBox(width: size.width * 0.05),
               ElevatedButton(
-                onPressed: () => {},
+                onPressed: () => {
+                  Navigator.pushNamed(context, '/iniciosesion'),
+                },
                 style: FilledButton.styleFrom(
                   backgroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(

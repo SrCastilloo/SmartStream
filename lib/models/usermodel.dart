@@ -12,4 +12,7 @@ class Usermodel {
       contrasena: json['contrasena'],
     );
   }
+  Map<String, dynamic> toJson() {
+    return {'nickname': nickname, 'correo': correo, 'contrasena': contrasena};
+  }
 }
