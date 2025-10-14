@@ -45,7 +45,7 @@ Future<Usermodel> crearUsuario(Usermodel newuser) async {
   }
 }
 
-Future<bool> intentoLogin(Usermodel user) async {
+Future<Usermodel> intentoLogin(Usermodel user) async {
   final response = await http.post(
     Uri.parse('https://apismartstream.onrender.com/login'),
     headers: {'Content-Type': 'application/json'},
@@ -53,8 +53,9 @@ Future<bool> intentoLogin(Usermodel user) async {
   );
 
   if (response.statusCode == 200 || response.statusCode == 201) {
-    return true;
+    final Map<String, dynamic> parsed = json.decode(response.body);
+    return Usermodel.fromJson(parsed);
   }
 
-  return false;
+  throw Exception("Error al loguear usuario ${response.statusCode}");
 }

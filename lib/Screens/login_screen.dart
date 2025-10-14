@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:smart_stream/Screens/main_screen.dart';
 import 'package:smart_stream/models/usermodel.dart';
 import 'package:smart_stream/requests/user_request.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
@@ -136,7 +137,7 @@ class Login extends StatelessWidget {
               Usermodel logeoUser = new Usermodel(
                 correo: correo,
                 contrasena: contrasena,
-                nickname: nickname,
+                nickname: null,
               );
 
               List<Usermodel> listaUsuarios = await obtenerUsuarios();
@@ -160,11 +161,17 @@ class Login extends StatelessWidget {
                 ).show();
               } else //intentamos procesar el login
               {
-                bool intentologin = await intentoLogin(logeoUser);
+                Usermodel us = await intentoLogin(logeoUser);
 
-                if (intentologin)
-                  print('Bienvenido');
-                else {
+                if (us.correo == logeoUser.correo) //usuario logueado
+                {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => MainScreen(nickname: us.nickname),
+                    ),
+                  );
+                } else {
                   AwesomeDialog(
                     context: context,
                     dialogType: DialogType.error,
