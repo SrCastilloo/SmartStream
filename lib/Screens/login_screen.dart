@@ -22,7 +22,6 @@ class Login extends StatelessWidget {
     final size = MediaQuery.of(context).size;
     String? correo;
     String? contrasena;
-    String? nickname;
 
     return Container(
       decoration: const BoxDecoration(
